@@ -4,7 +4,7 @@
 #
 Name     : brotli
 Version  : 1.0.7
-Release  : 8
+Release  : 9
 URL      : https://github.com/google/brotli/archive/v1.0.7.tar.gz
 Source0  : https://github.com/google/brotli/archive/v1.0.7.tar.gz
 Summary  : Brotli encoder library
