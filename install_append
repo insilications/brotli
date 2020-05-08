@@ -1,0 +1,4 @@
+#!rpm
+install -d %{buildroot}/usr/share/man/man{1,3}
+install -pm0644 docs/*.1 %{buildroot}/usr/share/man/man1
+install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3

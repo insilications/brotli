@@ -4,7 +4,7 @@
 #
 Name     : brotli
 Version  : 1.0.7
-Release  : 10
+Release  : 11
 URL      : https://github.com/google/brotli/archive/v1.0.7.tar.gz
 Source0  : https://github.com/google/brotli/archive/v1.0.7.tar.gz
 Summary  : Brotli encoder library
@@ -13,10 +13,13 @@ License  : MIT
 Requires: brotli-bin = %{version}-%{release}
 Requires: brotli-lib = %{version}-%{release}
 Requires: brotli-license = %{version}-%{release}
+Requires: brotli-man = %{version}-%{release}
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
 BuildRequires : buildreq-golang
 BuildRequires : cmake
+Patch1: 0001-Verbose-CLI-start-pulling-Shared-Brotli-722.patch
+Patch2: 0002-Ensure-decompression-consumes-all-input-730.patch
 
 %description
 BROTLI DATA COMPRESSIOM LIBRARY
@@ -41,6 +44,7 @@ Group: Development
 Requires: brotli-lib = %{version}-%{release}
 Requires: brotli-bin = %{version}-%{release}
 Provides: brotli-devel = %{version}-%{release}
+Requires: brotli = %{version}-%{release}
 
 %description dev
 dev components for the brotli package.
@@ -63,29 +67,50 @@ Group: Default
 license components for the brotli package.
 
 
+%package man
+Summary: man components for the brotli package.
+Group: Default
+
+%description man
+man components for the brotli package.
+
+
 %prep
 %setup -q -n brotli-1.0.7
+cd %{_builddir}/brotli-1.0.7
+%patch1 -p1
+%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1540748555
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1588972168
 mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$FFLAGS -fno-lto "
+export FFLAGS="$FFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
 %cmake ..
-make  %{?_smp_mflags} VERBOSE=1
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1540748555
+export SOURCE_DATE_EPOCH=1588972168
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/brotli
-cp LICENSE %{buildroot}/usr/share/package-licenses/brotli/LICENSE
+cp %{_builddir}/brotli-1.0.7/LICENSE %{buildroot}/usr/share/package-licenses/brotli/c045813a6c514f2d30d60a07c6aaf3603850e608
 pushd clr-build
 %make_install
 popd
+## install_append content
+install -d %{buildroot}/usr/share/man/man{1,3}
+install -pm0644 docs/*.1 %{buildroot}/usr/share/man/man1
+install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
+## install_append end
 
 %files
 %defattr(-,root,root,-)
@@ -106,6 +131,9 @@ popd
 /usr/lib64/pkgconfig/libbrotlicommon.pc
 /usr/lib64/pkgconfig/libbrotlidec.pc
 /usr/lib64/pkgconfig/libbrotlienc.pc
+/usr/share/man/man3/decode.h.3
+/usr/share/man/man3/encode.h.3
+/usr/share/man/man3/types.h.3
 
 %files lib
 %defattr(-,root,root,-)
@@ -118,4 +146,8 @@ popd
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/brotli/LICENSE
+/usr/share/package-licenses/brotli/c045813a6c514f2d30d60a07c6aaf3603850e608
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/brotli.1
