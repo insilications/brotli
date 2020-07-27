@@ -5,7 +5,7 @@
 %define keepstatic 1
 Name     : brotli
 Version  : 1.0.7
-Release  : 15
+Release  : 16
 URL      : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Source0  : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Summary  : Brotli encoder library
@@ -81,11 +81,14 @@ staticdev components for the brotli package.
 cd %{_builddir}/brotli-v1.0.7
 
 %build
+## build_prepend content
+find . -type f -name '*.pc.in' -exec sed -i 's/\-R${libdir}/\-L${libdir}/g' {} \;
+## build_prepend end
 unset http_proxy
 unset https_proxy
 unset no_proxy
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1595852866
+export SOURCE_DATE_EPOCH=1595853255
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -131,7 +134,7 @@ make  %{?_smp_mflags}  V=1 VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1595852866
+export SOURCE_DATE_EPOCH=1595853255
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
