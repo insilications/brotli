@@ -5,7 +5,7 @@
 %define keepstatic 1
 Name     : brotli
 Version  : 1.0.7
-Release  : 14
+Release  : 15
 URL      : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Source0  : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Summary  : Brotli encoder library
@@ -85,7 +85,7 @@ unset http_proxy
 unset https_proxy
 unset no_proxy
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1595852565
+export SOURCE_DATE_EPOCH=1595852866
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -116,7 +116,7 @@ export CXXFLAGS="${CXXFLAGS_GENERATE}"
 export FFLAGS="${FFLAGS_GENERATE}"
 export FCFLAGS="${FCFLAGS_GENERATE}"
 export LDFLAGS="${LDFLAGS_GENERATE}"
-%cmake .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1 -DCMAKE_BUILD_TYPE=Release
+%cmake .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1
 make  %{?_smp_mflags}  V=1 VERBOSE=1
 
 VERBOSE=1 V=1 make -j16 test
@@ -126,12 +126,12 @@ export CXXFLAGS="${CXXFLAGS_USE}"
 export FFLAGS="${FFLAGS_USE}"
 export FCFLAGS="${FCFLAGS_USE}"
 export LDFLAGS="${LDFLAGS_USE}"
-%cmake .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1 -DCMAKE_BUILD_TYPE=Release
+%cmake .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1
 make  %{?_smp_mflags}  V=1 VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1595852565
+export SOURCE_DATE_EPOCH=1595852866
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
