@@ -2,3 +2,7 @@
 # picked up automatically. One name per line, no whitespace.
 cmake
 findutils
+buildreq-cmake
+buildreq-distutils3
+buildreq-golang
+cmake

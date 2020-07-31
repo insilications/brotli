@@ -5,7 +5,7 @@
 %define keepstatic 1
 Name     : brotli
 Version  : 1.0.7
-Release  : 17
+Release  : 18
 URL      : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Source0  : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Summary  : Brotli encoder library
@@ -19,6 +19,11 @@ BuildRequires : buildreq-distutils3
 BuildRequires : buildreq-golang
 BuildRequires : cmake
 BuildRequires : findutils
+BuildRequires : gcc-dev32
+BuildRequires : gcc-libgcc32
+BuildRequires : gcc-libstdc++32
+BuildRequires : glibc-dev32
+BuildRequires : glibc-libc32
 # Suppress stripping binaries
 %define __strip /bin/true
 %define debug_package %{nil}
@@ -51,12 +56,31 @@ Requires: brotli = %{version}-%{release}
 dev components for the brotli package.
 
 
+%package dev32
+Summary: dev32 components for the brotli package.
+Group: Default
+Requires: brotli-lib32 = %{version}-%{release}
+Requires: brotli-bin = %{version}-%{release}
+Requires: brotli-dev = %{version}-%{release}
+
+%description dev32
+dev32 components for the brotli package.
+
+
 %package lib
 Summary: lib components for the brotli package.
 Group: Libraries
 
 %description lib
 lib components for the brotli package.
+
+
+%package lib32
+Summary: lib32 components for the brotli package.
+Group: Default
+
+%description lib32
+lib32 components for the brotli package.
 
 
 %package man
@@ -76,6 +100,15 @@ Requires: brotli-dev = %{version}-%{release}
 staticdev components for the brotli package.
 
 
+%package staticdev32
+Summary: staticdev32 components for the brotli package.
+Group: Default
+Requires: brotli-dev = %{version}-%{release}
+
+%description staticdev32
+staticdev32 components for the brotli package.
+
+
 %prep
 %setup -q -n brotli-v1.0.7
 cd %{_builddir}/brotli-v1.0.7
@@ -88,7 +121,7 @@ unset http_proxy
 unset https_proxy
 unset no_proxy
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1595867362
+export SOURCE_DATE_EPOCH=1596175130
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -132,17 +165,65 @@ export LDFLAGS="${LDFLAGS_USE}"
 %cmake .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1
 make  %{?_smp_mflags}  V=1 VERBOSE=1
 popd
+mkdir -p clr-build32
+pushd clr-build32
+## build_prepend content
+find . -type f -name '*.pc.in' -exec sed -i 's/\-R${libdir}/\-L${libdir}/g' {} \;
+## build_prepend end
+export GCC_IGNORE_WERROR=1
+## altflags_pgo content
+## pgo generate
+export PGO_GEN="-fprofile-generate=/var/tmp/pgo -fprofile-dir=/var/tmp/pgo -fprofile-abs-path -fprofile-update=atomic -fprofile-arcs -ftest-coverage --coverage -fprofile-partial-training"
+export CFLAGS_GENERATE="-O3 -march=native -mtune=native -falign-functions=32 -fno-semantic-interposition -fno-stack-protector -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -mtls-dialect=gnu2 -fno-math-errno -fno-trapping-math -pipe $PGO_GEN"
+export FCFLAGS_GENERATE="-O3 -march=native -mtune=native -falign-functions=32 -fno-semantic-interposition -fno-stack-protector -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -mtls-dialect=gnu2 -fno-math-errno -fno-trapping-math -pipe $PGO_GEN"
+export FFLAGS_GENERATE="-O3 -march=native -mtune=native -falign-functions=32 -fno-semantic-interposition -fno-stack-protector -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -mtls-dialect=gnu2 -fno-math-errno -fno-trapping-math -pipe $PGO_GEN"
+export CXXFLAGS_GENERATE="-O3 -march=native -mtune=native -falign-functions=32 -fno-semantic-interposition -fno-stack-protector -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -mtls-dialect=gnu2 -fno-math-errno -fno-trapping-math -fvisibility-inlines-hidden -pipe $PGO_GEN"
+export LDFLAGS_GENERATE="-O3 -march=native -mtune=native -falign-functions=32 -fno-semantic-interposition -fno-stack-protector -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -mtls-dialect=gnu2 -fno-math-errno -fno-trapping-math -pipe $PGO_GEN"
+## pgo use
+## -ffat-lto-objects -fno-PIE -fno-PIE -m64 -no-pie -fpic -fvisibility=hidden
+## gcc: -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-common -Wno-error -Wp,-D_REENTRANT -Wl,--as-needed
+export PGO_USE="-fprofile-use=/var/tmp/pgo -fprofile-dir=/var/tmp/pgo -fprofile-abs-path -fprofile-correction -fprofile-partial-training"
+export CFLAGS_USE="-g -O3 -march=native -mtune=native -fgraphite-identity -Wall -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -fno-common -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-plt -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe $PGO_USE"
+export FCFLAGS_USE="-g -O3 -march=native -mtune=native -fgraphite-identity -Wall -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -fno-common -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-plt -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe $PGO_USE"
+export FFLAGS_USE="-g -O3 -march=native -mtune=native -fgraphite-identity -Wall -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -fno-common -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-plt -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe $PGO_USE"
+export CXXFLAGS_USE="-g -O3 -march=native -mtune=native -fgraphite-identity -Wall -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -fno-common -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-plt -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -fvisibility-inlines-hidden -pipe $PGO_USE"
+export LDFLAGS_USE="-g -O3 -march=native -mtune=native -fgraphite-identity -Wall -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -fno-common -feliminate-unused-debug-types -fipa-pta -flto=16 -fno-plt -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe $PGO_USE"
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+#export CCACHE_DISABLE=1
+## altflags_pgo end
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
+export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
+export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
+%cmake -DLIB_INSTALL_DIR:PATH=/usr/lib32 -DCMAKE_INSTALL_LIBDIR=/usr/lib32 -DLIB_SUFFIX=32 .. -DENABLE_STATIC_LIB=1 -DENABLE_SHARED_LIB=1
+make  %{?_smp_mflags}  V=1 VERBOSE=1
+unset PKG_CONFIG_PATH
+popd
 
 %check
 export LANG=C.UTF-8
 unset http_proxy
 unset https_proxy
 unset no_proxy
-VERBOSE=1 V=1 make -j16 test
+cd clr-build; make test
+cd ../clr-build32;
+make test || :
 
 %install
-export SOURCE_DATE_EPOCH=1595867362
+export SOURCE_DATE_EPOCH=1596175130
 rm -rf %{buildroot}
+pushd clr-build32
+%make_install32
+if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
+then
+pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+popd
 pushd clr-build
 %make_install
 popd
@@ -176,6 +257,18 @@ install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
 /usr/share/man/man3/encode.h.3
 /usr/share/man/man3/types.h.3
 
+%files dev32
+%defattr(-,root,root,-)
+/usr/lib32/libbrotlicommon.so
+/usr/lib32/libbrotlidec.so
+/usr/lib32/libbrotlienc.so
+/usr/lib32/pkgconfig/32libbrotlicommon.pc
+/usr/lib32/pkgconfig/32libbrotlidec.pc
+/usr/lib32/pkgconfig/32libbrotlienc.pc
+/usr/lib32/pkgconfig/libbrotlicommon.pc
+/usr/lib32/pkgconfig/libbrotlidec.pc
+/usr/lib32/pkgconfig/libbrotlienc.pc
+
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libbrotlicommon.so.1
@@ -184,6 +277,15 @@ install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
 /usr/lib64/libbrotlidec.so.1.0.7
 /usr/lib64/libbrotlienc.so.1
 /usr/lib64/libbrotlienc.so.1.0.7
+
+%files lib32
+%defattr(-,root,root,-)
+/usr/lib32/libbrotlicommon.so.1
+/usr/lib32/libbrotlicommon.so.1.0.7
+/usr/lib32/libbrotlidec.so.1
+/usr/lib32/libbrotlidec.so.1.0.7
+/usr/lib32/libbrotlienc.so.1
+/usr/lib32/libbrotlienc.so.1.0.7
 
 %files man
 %defattr(0644,root,root,0755)
@@ -194,3 +296,9 @@ install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
 /usr/lib64/libbrotlicommon-static.a
 /usr/lib64/libbrotlidec-static.a
 /usr/lib64/libbrotlienc-static.a
+
+%files staticdev32
+%defattr(-,root,root,-)
+/usr/lib32/libbrotlicommon-static.a
+/usr/lib32/libbrotlidec-static.a
+/usr/lib32/libbrotlienc-static.a
