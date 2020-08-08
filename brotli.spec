@@ -5,7 +5,7 @@
 %define keepstatic 1
 Name     : brotli
 Version  : 1.0.7
-Release  : 18
+Release  : 19
 URL      : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Source0  : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.7.zip
 Summary  : Brotli encoder library
@@ -121,7 +121,7 @@ unset http_proxy
 unset https_proxy
 unset no_proxy
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1596175130
+export SOURCE_DATE_EPOCH=1596887079
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -193,6 +193,12 @@ export RANLIB=gcc-ranlib
 export NM=gcc-nm
 #export CCACHE_DISABLE=1
 ## altflags_pgo end
+export CFLAGS="-g -O3 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe"
+export CXXFLAGS="-g -O3 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -fvisibility-inlines-hidden -pipe"
+export LDFLAGS="-g -O3 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe"
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
@@ -213,7 +219,7 @@ cd ../clr-build32;
 make test || :
 
 %install
-export SOURCE_DATE_EPOCH=1596175130
+export SOURCE_DATE_EPOCH=1596887079
 rm -rf %{buildroot}
 pushd clr-build32
 %make_install32
@@ -231,6 +237,18 @@ popd
 install -d %{buildroot}/usr/share/man/man{1,3}
 install -pm0644 docs/*.1 %{buildroot}/usr/share/man/man1
 install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
+#
+pushd clr-build32
+ln -sf libbrotlicommon-static.a  %{buildroot}/usr/lib32/libbrotlicommon.a
+ln -sf libbrotlidec-static.a  %{buildroot}/usr/lib32/libbrotlidec.a
+ln -sf libbrotlienc-static.a  %{buildroot}/usr/lib32/libbrotlienc.a
+popd
+#
+pushd clr-build
+ln -sf libbrotlicommon-static.a  %{buildroot}/usr/lib64/libbrotlicommon.a
+ln -sf libbrotlidec-static.a  %{buildroot}/usr/lib64/libbrotlidec.a
+ln -sf libbrotlienc-static.a  %{buildroot}/usr/lib64/libbrotlienc.a
+popd
 ## install_append end
 
 %files
@@ -294,11 +312,17 @@ install -pm0644 docs/*.3 %{buildroot}/usr/share/man/man3
 %files staticdev
 %defattr(-,root,root,-)
 /usr/lib64/libbrotlicommon-static.a
+/usr/lib64/libbrotlicommon.a
 /usr/lib64/libbrotlidec-static.a
+/usr/lib64/libbrotlidec.a
 /usr/lib64/libbrotlienc-static.a
+/usr/lib64/libbrotlienc.a
 
 %files staticdev32
 %defattr(-,root,root,-)
 /usr/lib32/libbrotlicommon-static.a
+/usr/lib32/libbrotlicommon.a
 /usr/lib32/libbrotlidec-static.a
+/usr/lib32/libbrotlidec.a
 /usr/lib32/libbrotlienc-static.a
+/usr/lib32/libbrotlienc.a
