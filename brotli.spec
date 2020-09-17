@@ -5,7 +5,7 @@
 %define keepstatic 1
 Name     : brotli
 Version  : 1.0.9
-Release  : 20
+Release  : 21
 URL      : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.9.tar.gz
 Source0  : file:///insilications/build/clearlinux/packages/brotli/brotli-v1.0.9.tar.gz
 Summary  : Brotli encoder library
@@ -120,8 +120,9 @@ find . -type f -name '*.pc.in' -exec sed -i 's/\-R${libdir}/\-L${libdir}/g' {} \
 unset http_proxy
 unset https_proxy
 unset no_proxy
+export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1599656117
+export SOURCE_DATE_EPOCH=1600332809
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -159,7 +160,7 @@ export LDFLAGS="${LDFLAGS_GENERATE}"
 make  %{?_smp_mflags}  V=1 VERBOSE=1
 
 VERBOSE=1 V=1 make -j16 test
-find . -type f -not -name '*.gcno' -delete -print
+find . -type f,l -not -name '*.gcno' -delete -print
 export CFLAGS="${CFLAGS_USE}"
 export CXXFLAGS="${CXXFLAGS_USE}"
 export FFLAGS="${FFLAGS_USE}"
@@ -195,12 +196,13 @@ export LANG=C.UTF-8
 unset http_proxy
 unset https_proxy
 unset no_proxy
+export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 cd clr-build; make test
 cd ../clr-build32;
 make test || :
 
 %install
-export SOURCE_DATE_EPOCH=1599656117
+export SOURCE_DATE_EPOCH=1600332809
 rm -rf %{buildroot}
 pushd clr-build32
 %make_install32
