@@ -1,8 +1,7 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
-cmake
-findutils
 buildreq-cmake
 buildreq-distutils3
 buildreq-golang
 cmake
+findutils
