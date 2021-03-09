@@ -4,7 +4,7 @@
 #
 Name     : brotli
 Version  : 1.0.9
-Release  : 12
+Release  : 13
 URL      : https://github.com/google/brotli/archive/v1.0.9/brotli-1.0.9.tar.gz
 Source0  : https://github.com/google/brotli/archive/v1.0.9/brotli-1.0.9.tar.gz
 Summary  : Brotli encoder library
@@ -16,6 +16,7 @@ Requires: brotli-license = %{version}-%{release}
 Requires: brotli-man = %{version}-%{release}
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
+Patch1: 0001-Revert-Add-runtime-linker-path-to-pkg-config-files-7.patch
 
 %description
 BROTLI DATA COMPRESSION LIBRARY
@@ -74,13 +75,14 @@ man components for the brotli package.
 %prep
 %setup -q -n brotli-1.0.9
 cd %{_builddir}/brotli-1.0.9
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1614896342
+export SOURCE_DATE_EPOCH=1615314890
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -93,7 +95,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1614896342
+export SOURCE_DATE_EPOCH=1615314890
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/brotli
 cp %{_builddir}/brotli-1.0.9/LICENSE %{buildroot}/usr/share/package-licenses/brotli/c045813a6c514f2d30d60a07c6aaf3603850e608
