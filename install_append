@@ -14,3 +14,5 @@ ln -sf libbrotlicommon-static.a  %{buildroot}/usr/lib64/libbrotlicommon.a
 ln -sf libbrotlidec-static.a  %{buildroot}/usr/lib64/libbrotlidec.a
 ln -sf libbrotlienc-static.a  %{buildroot}/usr/lib64/libbrotlienc.a
 popd
+install -dm 0755 %{buildroot}/usr/lib64/haswell/ || :
+cp --archive %{buildroot}/usr/lib64/lib*.so* %{buildroot}/usr/lib64/haswell/ || :
